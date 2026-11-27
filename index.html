@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exerra Heat Marketplace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the Exerra deck as a product. Night-forest green, mint for buildings and "go", amber for heat. A sticky nav over three pages: Platform, Marketplace, AI Feasibility. Single dark theme on purpose. */
+:root{
+  --bg:#06120E; --bg2:#0A1A15; --surface:#0F231D; --raised:#153E33; --line:#21403A; --line2:#2E5246;
+  --ink:#F2F7F0; --muted:#A9BDB5; --dim:#7F978E; --mint:#4ED3AC; --mint-ink:#062019; --mint-soft:#123A30;
+  --amber:#F3AF67; --amber-soft:#3A2B1A; --bad:#F08A7E; --bad-soft:#3B1E1B;
+  --sans:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"Noto Sans Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:radial-gradient(900px 500px at 85% -10%,rgba(78,211,172,.10),transparent 60%),radial-gradient(700px 500px at -10% 40%,rgba(243,175,103,.06),transparent 60%)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(40px,5.6vw,84px);font-weight:800;line-height:1.02}
+h2{font-size:clamp(28px,3.2vw,44px);font-weight:800;line-height:1.1}
+h3{font-size:1.1rem;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.muted{color:var(--muted)} .dim{color:var(--dim)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--mint)}
+button{font:inherit;cursor:pointer;color:inherit}
+a{color:var(--mint)}
+:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+
+/* Nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(6,18,14,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)))}
+.nav-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:8px 28px;flex-wrap:wrap;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px))}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.38em;font-size:1rem;text-decoration:none;color:var(--ink)}
+.logo svg{flex:none}
+.links{display:flex;gap:4px;flex-wrap:wrap}
+.links a{color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:600;padding:7px 12px;border-radius:99px}
+.links a:hover{color:var(--ink)}
+.links a[aria-current="page"]{color:var(--ink);background:var(--raised)}
+.nav .cta{margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);background:transparent;padding:10px 18px;border-radius:99px;font-weight:600;font-size:.94rem;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--mint)}
+.btn.primary{background:var(--mint);border-color:var(--mint);color:var(--mint-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:6px 13px;font-size:.84rem}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#2A1A08}
+
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:.64rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.t-work{color:var(--mint);background:var(--mint-soft)} .t-sim{color:var(--amber);background:var(--amber-soft)} .t-plan{color:var(--muted);background:var(--bg2)}
+.pill{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.p-good{color:var(--mint);background:var(--mint-soft)} .p-warn{color:var(--amber);background:var(--amber-soft)} .p-bad{color:var(--bad);background:var(--bad-soft)} .p-ver{color:var(--ink);background:var(--raised)}
+
+section.page{padding-block:32px 72px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+
+/* Home */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:center;padding-block:40px 56px}
+.hero .lead{font-size:1.2rem;color:var(--muted);max-width:52ch;margin-top:20px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.scene{width:100%;height:auto;display:block}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.flow-dash{stroke-dasharray:10 16;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-26}}
+.wave{animation:rise 2.6s ease-in infinite;opacity:0}
+.wave.w2{animation-delay:.9s}.wave.w3{animation-delay:1.7s}
+@keyframes rise{0%{transform:translateY(8px);opacity:0}30%{opacity:.9}100%{transform:translateY(-40px);opacity:0}}
+.led{animation:blink 1.6s steps(2) infinite}
+.led.l2{animation-delay:.4s}.led.l3{animation-delay:.9s}
+@keyframes blink{50%{opacity:.25}}
+.win{animation:glow 5s ease-in-out infinite}
+@keyframes glow{50%{opacity:.55}}
+.sec{padding-block:56px;border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:12px;margin-bottom:32px;max-width:760px}
+.sec-head p{color:var(--muted);font-size:1.08rem}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){.grid3,.grid2,.grid4{grid-template-columns:1fr}}
+.qcard{padding:26px;display:grid;gap:10px;align-content:start}
+.qcard .n{font-family:var(--mono);color:var(--mint);font-size:.85rem}
+.qcard p{color:var(--muted)}
+.engines{display:grid;grid-template-columns:minmax(0,1fr) 120px minmax(0,1fr);align-items:stretch}
+.engine{padding:30px;display:grid;gap:12px;align-content:start}
+.engine ul{margin:4px 0 0;padding-left:18px;color:var(--muted);display:grid;gap:4px}
+.loop{display:grid;place-items:center}
+@media (max-width:900px){.engines{grid-template-columns:1fr}.loop{height:80px}.loop svg{transform:rotate(90deg)}}
+.steps4 .st{padding:22px;display:grid;gap:8px;align-content:start}
+.steps4 .st b{font-family:var(--mono);color:var(--amber);font-size:.8rem;font-weight:500}
+.steps4 .st p{color:var(--muted);font-size:.94rem}
+.aud{padding:30px;display:grid;gap:14px;align-content:start}
+.aud ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.aud li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--muted)}
+.aud li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:8px;background:var(--mint)}
+.aud.sup li::before{background:var(--amber)}
+.proof{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center;padding:36px}
+@media (max-width:900px){.proof{grid-template-columns:1fr}}
+.biz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.biz > div{padding:28px;border-left:1px solid var(--line);display:grid;gap:8px;align-content:start}
+.biz > div:first-child{border-left:none}
+.biz .v{font-size:2.2rem;font-weight:800;letter-spacing:-.02em}
+@media (max-width:900px){.biz{grid-template-columns:1fr}.biz > div{border-left:none;border-top:1px solid var(--line)}.biz > div:first-child{border-top:none}}
+.pilot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;padding:36px;align-items:start;background:linear-gradient(135deg,var(--raised),var(--surface))}
+@media (max-width:900px){.pilot{grid-template-columns:1fr}}
+.form{display:grid;gap:14px}
+.field{display:grid;gap:6px;min-width:0}
+label{font-size:.82rem;font-weight:600;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:var(--bg2);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+input[type=number]{font-family:var(--mono)}
+.unit{position:relative}.unit input{padding-right:72px}
+.unit span{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.78rem;color:var(--dim);pointer-events:none}
+.ok{padding:12px 14px;border-radius:10px;background:var(--mint-soft);color:var(--mint);font-weight:600}
+footer{border-top:1px solid var(--line);padding-block:28px 48px;display:flex;gap:16px 32px;flex-wrap:wrap;justify-content:space-between;color:var(--dim);font-size:.84rem}
+
+/* Marketplace */
+.mhead{display:flex;gap:16px;align-items:end;justify-content:space-between;flex-wrap:wrap;margin-bottom:20px}
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:3px}
+.seg button{border:none;background:none;padding:7px 14px;border-radius:99px;font-weight:600;font-size:.86rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--raised);color:var(--ink)}
+.mlayout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.mlayout{grid-template-columns:1fr}}
+.mapcard{padding:12px;position:relative}
+.mapbox{overflow-x:auto}
+.mapbox svg{display:block;width:100%;min-width:560px;height:auto}
+.filters{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;padding:6px 6px 12px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600;color:var(--muted);background:none;border:1px solid var(--line2);border-radius:99px;padding:6px 12px}
+.toggle[aria-pressed="true"]{border-color:var(--mint);color:var(--mint)}
+.range{display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--muted)}
+.range input{width:130px;padding:0;border:none;background:none;accent-color:var(--mint)}
+.list{display:grid;gap:10px;max-height:none}
+.lcard{padding:16px;display:grid;gap:10px;cursor:pointer;transition:border-color .2s,background .2s}
+.lcard:hover{border-color:var(--line2)}
+.lcard.sel{border-color:var(--mint);background:var(--raised)}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.lstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lstats .v{font-family:var(--mono);font-size:.98rem}
+.lstats .k{font-size:.72rem;color:var(--dim)}
+.node{cursor:pointer}
+.node .halo{animation:pulse 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(2.2);opacity:0}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);padding:10px 6px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* Feasibility */
+.slayout{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.slayout{grid-template-columns:1fr}}
+.panel{padding:22px;display:grid;gap:16px;align-content:start}
+.console{background:#03100C;border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:.84rem;min-height:180px;display:grid;gap:5px;align-content:start}
+.console .ln{display:flex;gap:10px;color:var(--muted)}
+.console .ln b{color:var(--mint);font-weight:500}
+.console .ln.done{color:var(--ink)}
+.caret{display:inline-block;width:8px;height:1.1em;background:var(--mint);vertical-align:-2px;animation:blink 1s steps(2) infinite}
+.agent{display:flex;align-items:center;gap:12px}
+.agent .av{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--mint),#1E8F70);display:grid;place-items:center;color:var(--mint-ink);font-weight:800}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.kpi{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.kpi .v{font-size:1.35rem;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.kpi .k{font-size:.74rem;color:var(--dim)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.kpis{grid-template-columns:1fr 1fr}}
+.rtable{display:grid;gap:8px}
+.rrow{display:grid;grid-template-columns:48px minmax(0,1.4fr) minmax(0,1.6fr) 96px 104px;gap:14px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.rrow:hover{border-color:var(--line2)}
+.rrow.pick{border-color:var(--mint);background:var(--raised)}
+.rrow .rk{font-weight:800;font-size:1.15rem;color:var(--mint);white-space:nowrap}
+.rrow .nm{font-weight:600;min-width:0}
+.rrow .nm small{display:block;color:var(--dim);font-weight:400;font-size:.76rem}
+.bar{height:10px;border-radius:99px;background:var(--bg2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--mint);transition:width .5s}
+.bar i.neg{background:var(--bad)}
+.rrow .c{text-align:right;font-family:var(--mono);font-size:.9rem;white-space:nowrap}
+.delta{font-size:.7rem;margin-left:3px}.delta.up{color:var(--mint)}.delta.down{color:var(--bad)}
+@media (max-width:700px){.rrow{grid-template-columns:40px minmax(0,1fr) 100px}.rrow .hide-s{display:none}}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:12px;align-content:start;min-width:0;background:var(--surface)}
+.box .bh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chart svg{display:block;width:100%;height:auto}
+.cb{display:grid;gap:10px}
+.cb .row{display:grid;grid-template-columns:150px minmax(0,1fr) 72px;gap:12px;align-items:center;font-size:.86rem}
+.cb .row .t{height:14px;border-radius:4px}
+.cb .row .val{font-family:var(--mono);text-align:right}
+.cb .row.total{font-weight:700;border-top:1px solid var(--line);padding-top:10px}
+.temps{display:flex;justify-content:space-between;gap:8px;text-align:center}
+.temps .v{font-family:var(--mono);font-size:1.2rem}
+.temps .k{font-size:.72rem;color:var(--dim)}
+.ramp{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--amber),var(--mint))}
+.notes{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.notes li{display:grid;grid-template-columns:24px 1fr;gap:10px;color:var(--muted);font-size:.94rem}
+.notes li::before{content:"✦";color:var(--mint);font-size:.9rem;line-height:1.6}
+.notes li.q::before{content:"?";color:var(--amber);font-weight:800}
+.sens{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.sens{grid-template-columns:1fr}}
+.slider{background:var(--raised);border:1px solid var(--mint);border-radius:12px;padding:18px;display:grid;gap:10px}
+.slider .val{font-family:var(--mono);font-size:1.7rem}
+.slider input{padding:0;border:none;background:none;accent-color:var(--mint)}
+.toast{padding:11px 14px;border-radius:10px;background:var(--mint-soft);color:var(--mint);font-weight:600;font-size:.92rem}
+.fade-in{animation:fin .5s ease both}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(3,10,8,.72);backdrop-filter:blur(6px);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal .card{width:min(720px,100%);padding:28px;display:grid;gap:18px;max-height:100%;overflow:auto}
+.msg{background:var(--bg2);border-radius:10px;padding:14px;font-size:.88rem;white-space:pre-line;color:var(--muted)}
+.flowl{list-style:none;margin:0;padding:0}
+.flowl li{display:grid;grid-template-columns:26px 1fr;gap:12px;padding-bottom:16px;position:relative}
+.flowl li::after{content:"";position:absolute;left:12px;top:26px;bottom:2px;width:2px;background:var(--line)}
+.flowl li:last-child::after{display:none}
+.flowl .dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line2);display:grid;place-items:center;font-size:.75rem;font-weight:800;color:var(--mint-ink);transition:background .3s}
+.flowl li.on .dot{background:var(--mint);border-color:var(--mint)}
+.flowl .t{font-weight:600} .flowl .d{font-size:.84rem;color:var(--dim)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in">
+  <a class="logo" href="#home" aria-label="Exerra home">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="7" fill="#123A30"/><path d="M7 17c3-1 4-8 6-8s3 7 6 8" fill="none" stroke="#F3AF67" stroke-width="2.2" stroke-linecap="round"/><circle cx="13" cy="9" r="2.2" fill="#4ED3AC"/></svg>
+    EXERRA</a>
+  <div class="links" id="links">
+    <a href="#home" data-r="home">Platform</a>
+    <a href="#market" data-r="market">Marketplace</a>
+    <a href="#screen" data-r="screen">AI Feasibility</a>
+  </div>
+  <a class="btn primary small cta" href="#screen" id="navCta">Screen a project</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- ================= HOME ================= -->
+<section class="page" id="p-home">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">AI-powered heat marketplace</div>
+      <h1 style="margin-top:16px">Data centers make heat. Buildings need it.</h1>
+      <p class="lead">Exerra finds the data centers near your project, screens whether their waste heat can warm your building, and ranks the deals worth pursuing.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#screen" id="heroScreen">Screen a project →</a>
+        <a class="btn" href="#market" id="heroMarket">Browse the marketplace</a>
+      </div>
+      <div class="meta"><span class="tag t-work">Feasibility model works</span><span class="tag t-sim">Supplier data simulated</span><span class="tag t-plan">Live data planned</span></div>
+    </div>
+    <svg class="scene" viewBox="0 0 560 420" role="img" aria-label="Animated sketch: heat flows from a data center through an insulated pipe and heat pump into an apartment building">
+      <defs>
+        <linearGradient id="pipeG" x1="0" x2="1"><stop offset="0" stop-color="#F3AF67"/><stop offset="1" stop-color="#4ED3AC"/></linearGradient>
+        <radialGradient id="heatG"><stop offset="0" stop-color="#F3AF67" stop-opacity=".45"/><stop offset="1" stop-color="#F3AF67" stop-opacity="0"/></radialGradient>
+      </defs>
+      <line x1="10" y1="350" x2="550" y2="350" stroke="#21403A" stroke-width="2"/>
+      <circle cx="105" cy="250" r="120" fill="url(#heatG)"/>
+      <rect x="40" y="220" width="130" height="130" rx="10" fill="#0F231D" stroke="#2E5246" stroke-width="2"/>
+      <g fill="#153E33">
+        <rect x="56" y="236" width="28" height="98" rx="3"/><rect x="91" y="236" width="28" height="98" rx="3"/><rect x="126" y="236" width="28" height="98" rx="3"/>
+      </g>
+      <g fill="#4ED3AC">
+        <circle class="led" cx="64" cy="248" r="2.5"/><circle class="led l2" cx="64" cy="262" r="2.5"/><circle class="led l3" cx="99" cy="248" r="2.5"/>
+        <circle class="led l2" cx="134" cy="256" r="2.5"/><circle class="led" cx="134" cy="276" r="2.5"/><circle class="led l3" cx="99" cy="290" r="2.5"/>
+      </g>
+      <g stroke="#F3AF67" stroke-width="3" fill="none" stroke-linecap="round">
+        <path class="wave" d="M70 205 q8 -10 0 -20 q-8 -10 0 -20"/><path class="wave w2" d="M105 205 q8 -10 0 -20 q-8 -10 0 -20"/><path class="wave w3" d="M140 205 q8 -10 0 -20 q-8 -10 0 -20"/>
+      </g>
+      <text x="105" y="378" text-anchor="middle" font-family="Noto Sans Mono, monospace" font-size="13" fill="#A9BDB5">DATA CENTER · 122 °F</text>
+      <path d="M170 320 C 230 320, 230 300, 262 300 L 300 300 C 330 300, 330 320, 380 320" fill="none" stroke="#153E33" stroke-width="16" stroke-linecap="round"/>
+      <path d="M170 320 C 230 320, 230 300, 262 300 L 300 300 C 330 300, 330 320, 380 320" fill="none" stroke="url(#pipeG)" stroke-width="6" stroke-linecap="round"/>
+      <path class="flow-dash" d="M170 320 C 230 320, 230 300, 262 300 L 300 300 C 330 300, 330 320, 380 320" fill="none" stroke="#F2F7F0" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="248" y="268" width="66" height="44" rx="8" fill="#0F231D" stroke="#4ED3AC" stroke-width="2"/>
+      <text x="281" y="295" text-anchor="middle" font-family="Noto Sans Mono, monospace" font-size="12" fill="#4ED3AC">COP 7</text>
+      <text x="281" y="256" text-anchor="middle" font-family="Noto Sans, sans-serif" font-size="12" fill="#A9BDB5">heat pump</text>
+      <rect x="380" y="90" width="140" height="260" rx="8" fill="#0F231D" stroke="#2E5246" stroke-width="2"/>
+      <g id="windows"></g>
+      <text x="450" y="378" text-anchor="middle" font-family="Noto Sans Mono, monospace" font-size="13" fill="#A9BDB5">APARTMENTS · 150 °F</text>
+    </svg>
+  </div>
+
+  <div class="sec" id="h-problem">
+    <div class="sec-head"><div class="eyebrow">The problem</div><h2>Waste heat is next door. The deal is hard to see.</h2>
+      <p>An apartment developer planning heating has to answer three questions before a data-center heat deal is real. Today each one takes consultants and weeks.</p></div>
+    <div class="grid3">
+      <div class="card qcard"><span class="n">01 · Discover</span><h3>Who has heat to export?</h3><p>Which nearby data center actually has recoverable heat, and is willing to sell it?</p></div>
+      <div class="card qcard"><span class="n">02 · Engineer</span><h3>Does the physics fit?</h3><p>Temperature, demand, pipe route and backup systems all have to line up.</p></div>
+      <div class="card qcard"><span class="n">03 · Justify</span><h3>Do the numbers work?</h3><p>Avoided heating cost has to beat the investment and the cost of running it.</p></div>
+    </div>
+  </div>
+
+  <div class="sec" id="h-engines">
+    <div class="sec-head"><div class="eyebrow">The platform</div><h2>One platform. Two connected engines.</h2>
+      <p>Not just a directory. Not just a calculator. Every feasibility result updates the marketplace ranking.</p></div>
+    <div class="engines">
+      <div class="card engine"><span class="tag t-sim" style="justify-self:start">Discovery</span><h3 style="font-size:1.5rem">AI marketplace</h3>
+        <p class="muted">Reads what a building needs and maps the data centers that could supply it.</p>
+        <ul><li>Supplier profiles: capacity, cooling, waste-heat temperature</li><li>Verified profiles and labeled unverified prospects</li><li>Heat requests from buyers, visible to suppliers</li></ul></div>
+      <div class="loop" aria-hidden="true"><svg width="110" height="90" viewBox="0 0 110 90"><path d="M8 30 H96" stroke="#4ED3AC" stroke-width="3" class="flow-dash" fill="none"/><path d="M88 22 L100 30 L88 38" stroke="#4ED3AC" stroke-width="3" fill="none"/><path d="M102 60 H14" stroke="#F3AF67" stroke-width="3" class="flow-dash" fill="none"/><path d="M22 52 L10 60 L22 68" stroke="#F3AF67" stroke-width="3" fill="none"/></svg></div>
+      <div class="card engine"><span class="tag t-work" style="justify-self:start">Decision</span><h3 style="font-size:1.5rem">AI feasibility analyst</h3>
+        <p class="muted">Screens every match the way an engineer would, in minutes instead of weeks.</p>
+        <ul><li>Recoverable heat and share of demand covered</li><li>Heat-pump lift and efficiency</li><li>Pipe route cost, savings, payback, 25-year value</li></ul></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><div class="eyebrow">How it works</div><h2>From heat request to introduction</h2></div>
+    <div class="grid4 steps4">
+      <div class="card st"><b>STEP 1</b><h3>Enter your need</h3><p>Site, annual heat demand, peak load and supply temperature.</p></div>
+      <div class="card st"><b>STEP 2</b><h3>Find suppliers</h3><p>Verified profiles plus clearly labeled unverified prospects nearby.</p></div>
+      <div class="card st"><b>STEP 3</b><h3>Screen the deals</h3><p>Heat, route, cost, reliability and payback, with every unknown flagged.</p></div>
+      <div class="card st"><b>STEP 4</b><h3>Request an intro</h3><p>A credible shortlist. Contact details shared only when both sides opt in.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="grid2">
+      <div class="card aud"><div class="eyebrow">For developers</div><h2 style="font-size:1.8rem">Lower-cost heat, screened before you commit.</h2>
+        <ul><li>See every nearby heat source on one map</li><li>A go or no-go with payback and 25-year value</li><li>Know exactly what still needs an engineer’s check</li></ul></div>
+      <div class="card aud sup"><div class="eyebrow" style="color:var(--amber)">For data-center operators</div><h2 style="font-size:1.8rem">Turn a cooling cost into a revenue line.</h2>
+        <ul><li>Get matched with buildings that can use your heat</li><li>See what your heat is worth per year</li><li>Only talk to buyers whose numbers already work</li></ul></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="card proof">
+      <div><div class="eyebrow">It already works</div><h2 style="margin-top:12px">Data-center heat already warms buildings.</h2></div>
+      <p class="muted" style="font-size:1.08rem">In Seattle, heat from the Westin Building Exchange data center warms Amazon’s nearby campus. The engineering is proven. What’s missing is a fast way to find and screen deals like it. <span class="dim">(A real example, not an Exerra customer.)</span></p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><div class="eyebrow">Business model</div><h2>We sell decisions, not pipes.</h2></div>
+    <div class="card biz">
+      <div><span class="dim">Who pays</span><span class="v">Developers</span><p class="muted">and energy project teams, for a faster go or no-go.</p></div>
+      <div><span class="dim">Pilot price</span><span class="v">$2,000</span><p class="muted">per screened project. A hypothesis we are testing.</p></div>
+      <div><span class="dim">Who builds</span><span class="v">Partners</span><p class="muted">Engineering firms design and install. Buyer, supplier or investor funds it.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="card pilot">
+      <div style="display:grid;gap:12px"><div class="eyebrow">Atlanta pilot</div><h2>Join the first five pilot partners.</h2>
+        <p class="muted">We are recruiting 3 apartment developers and 2 data-center operators in Atlanta for one independently reviewed screen.</p></div>
+      <form class="form" id="pilotForm" novalidate>
+        <div class="field"><label for="pf-org">Organization</label><input id="pf-org" placeholder="Your company"></div>
+        <div class="field"><label for="pf-role">I am a</label><select id="pf-role"><option>Developer or owner</option><option>Data-center operator</option><option>Engineering firm</option><option>Investor</option></select></div>
+        <button class="btn primary" type="submit" style="justify-self:start">Request a pilot spot</button>
+        <div id="pilotOk" hidden class="ok">Thanks. This prototype doesn’t send anything yet. Find the team at HackATL.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MARKETPLACE ================= -->
+<section class="page" id="p-market" hidden>
+  <div class="mhead">
+    <div style="display:grid;gap:8px"><div class="eyebrow">Marketplace</div><h2>Heat near Westside Yards</h2>
+      <p class="muted">Data centers with recoverable heat, and buildings looking for it. <span class="tag t-sim">Profiles simulated</span></p></div>
+    <div class="seg" role="group" aria-label="Show">
+      <button type="button" data-tab="sup" aria-pressed="true">Heat suppliers</button>
+      <button type="button" data-tab="buy" aria-pressed="false">Heat requests</button>
+    </div>
+  </div>
+  <div class="mlayout">
+    <div class="card mapcard">
+      <div class="filters" id="filters"></div>
+      <div class="mapbox" id="map"></div>
+      <div class="legend"><span><i style="background:var(--amber)"></i>Data center</span><span><i style="background:var(--mint)"></i>Heat request</span><span><i style="background:var(--ink)"></i>Your project</span><span class="dim">Schematic map. Distances measured from Westside Yards.</span></div>
+    </div>
+    <div class="list" id="mlist"></div>
+  </div>
+</section>
+
+<!-- ================= FEASIBILITY ================= -->
+<section class="page" id="p-screen" hidden>
+  <div class="mhead">
+    <div style="display:grid;gap:8px"><div class="eyebrow">AI feasibility analyst</div><h2>Screen every match in minutes</h2>
+      <p class="muted">Enter the project. The analyst estimates heat, heat-pump lift, pipe cost and value for every nearby supplier.</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag t-work">Model is real math</span><span class="tag t-sim">Suppliers simulated</span></div>
+  </div>
+  <div class="slayout">
+    <div class="card panel">
+      <h3>Project</h3>
+      <form class="form" id="reqForm" novalidate>
+        <div class="field"><label for="f-name">Name</label><input id="f-name"></div>
+        <div class="field"><label for="f-demand">Annual heat demand</label><div class="unit"><input id="f-demand" type="number" step="100"><span>MWh/yr</span></div></div>
+        <div class="field"><label for="f-peak">Peak heat load</label><div class="unit"><input id="f-peak" type="number" step="100"><span>kW</span></div></div>
+        <div class="field"><label for="f-supply">Supply temperature</label><div class="unit"><input id="f-supply" type="number" step="5"><span>°F</span></div></div>
+        <div class="field"><label for="f-base">Otherwise you’d install</label><select id="f-base"><option value="resist">Electric resistance heat</option><option value="gas">Gas boiler</option><option value="ashp">Air-source heat pumps</option></select></div>
+        <div class="field"><label for="f-elec">Electricity price</label><div class="unit"><input id="f-elec" type="number" step="0.01"><span>$/kWh</span></div></div>
+        <button class="btn primary" type="submit" id="runBtn">Run AI screen</button>
+      </form>
+    </div>
+    <div style="display:grid;gap:16px;min-width:0">
+      <div class="card panel">
+        <div class="agent"><div class="av">Ex</div><div><h3>Exerra analyst</h3><p class="dim" style="font-size:.82rem">Every step uses cited assumptions. Unknowns are flagged, not hidden.</p></div></div>
+        <div class="console" id="console" aria-live="polite"></div>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>EXERRA · HackATL 2026 · Track 3</span>
+  <span>Prototype. Westside Yards and all data centers shown are fictional. Figures are preliminary screening estimates, not an engineering design.</span>
+</footer>
+</main>
+
+<div class="modal" id="modal" hidden></div>
+
+<script>
+(() => {
+"use strict";
+/* ---------------- Data (simulated profiles) ---------------- */
+const SUPPLIERS = [
+  {id:"A", name:"Howell Mill DC-3", op:"Colocation", itMW:7, cooling:"air", tempC:32, miles:0.5, ang:60, verified:true, src:"Warm-water loop off air handlers", risks:["Part of the route shares a rail right-of-way"]},
+  {id:"B", name:"Chattahoochee Liquid Compute", op:"AI training cluster", itMW:8, cooling:"liquid", tempC:50, miles:0.7, ang:140, left:true, verified:true, src:"Direct-to-chip liquid cooling return", risks:["Route crosses a state road, so permit timing is unknown"]},
+  {id:"C", name:"Marietta St Edge Colo", op:"Edge colocation", itMW:2.2, cooling:"air", tempC:29, miles:0.2, ang:-10, verified:false, src:"Rooftop chillers (estimated)", risks:["Operator not contacted yet","Capacity estimated from permit filings"]},
+  {id:"D", name:"Northside AI Campus", op:"Hyperscale AI campus", itMW:24, cooling:"liquid", tempC:45, miles:2.4, ang:30, verified:true, src:"Liquid cooling return loop", risks:["Long route through dense streets"]},
+  {id:"E", name:"Ellsworth Data Hall", op:"Colocation", itMW:5, cooling:"air", tempC:30, miles:1.3, ang:200, verified:false, src:"Chilled-water return (estimated)", risks:["Operator not contacted yet"]},
+  {id:"F", name:"Midtown Exchange", op:"Carrier hotel", itMW:3.5, cooling:"air", tempC:31, miles:1.9, ang:-15, verified:true, src:"Condenser water loop", risks:["Building owner approval needed"]},
+];
+const BUYERS = [
+  {id:"W", name:"Westside Yards", type:"Mixed-use · 900 apartments", demand:9000, peak:3200, supplyF:150, mx:0, my:0, mine:true},
+  {id:"K", name:"Bankhead Commons", type:"420 apartments", demand:3800, peak:1500, supplyF:140, mx:-1.5, my:-0.3},
+  {id:"G", name:"Grove Park Co-op", type:"Affordable housing · 260 units", demand:2400, peak:1000, supplyF:140, mx:-2.2, my:0.5},
+  {id:"L", name:"Marietta Lofts", type:"Office-to-residential", demand:3100, peak:1400, supplyF:150, mx:1.0, my:-0.9},
+  {id:"H", name:"Ashby Clinic", type:"Medical office", demand:1600, peak:700, supplyF:160, mx:-0.8, my:-1.1},
+];
+const BASE = {resist:"electric resistance heat", gas:"a gas boiler", ashp:"air-source heat pumps"};
+const DEF_REQ = {name:"Westside Yards", demandMWh:9000, peakKW:3200, supplyF:150, baseline:"resist"};
+const DEF_A = {pipe:550, elec:0.12, gas:1.25, hp:750, avoid:400, heatPrice:6, rate:6, years:25};
+const S = {req:{...DEF_REQ}, a:{...DEF_A}, run:"idle", lines:0, pick:null, prevRank:null, rankMsg:"",
+  m:{tab:"sup", cooling:"all", verified:false, maxMi:3, sel:null}, intro:-1};
+
+/* ---------------- Feasibility model (working) ---------------- */
+const fToC = f => (f-32)*5/9, cToF = c => c*9/5+32;
+function evaluate(s, r, a){
+  const availKW = s.itMW*1000*(s.cooling==="liquid"?0.75:0.55);
+  const share = Math.min(1, Math.pow(availKW/r.peakKW, 0.6));
+  const routeMi = s.miles*1.3, routeFt = routeMi*5280;
+  const supC = fToC(r.supplyF), srcC = s.tempC-3-0.6*routeMi, lift = supC-srcC;
+  const cop = lift<=0 ? 7 : Math.min(7, 0.5*(supC+273.15)/lift);
+  const delivered = r.demandMWh*share;
+  const baseCost = {gas:a.gas*34.12/0.85, resist:a.elec*1000, ashp:a.elec*1000/2.6}[r.baseline];
+  const hpKW = Math.min(availKW, r.peakKW);
+  const cap = {pipe:routeFt*a.pipe, hp:hpKW*a.hp, ix:350000, avoid:-hpKW*a.avoid};
+  const capex = cap.pipe+cap.hp+cap.ix+cap.avoid;
+  const savings = delivered*baseCost - (delivered/cop+delivered*0.02)*a.elec*1000 - delivered*a.heatPrice - 0.01*capex;
+  let npv=-capex; for(let t=1;t<=a.years;t++) npv += savings/Math.pow(1+a.rate/100,t);
+  const payback = savings>0 ? capex/savings : Infinity;
+  const score = npv>0 ? npv*(s.verified?1:0.6) : npv;
+  const verdict = npv>0&&payback<=8 ? "Viable" : npv>0&&payback<=15 ? "Marginal" : "Not viable";
+  return {s, availKW, share, routeMi, routeFt, srcC, lift, cop, delivered, hpKW, cap, capex, savings, npv, payback, score, verdict, supplierRev:delivered*a.heatPrice};
+}
+const ranked = (r=S.req) => SUPPLIERS.map(s=>evaluate(s,r,S.a)).sort((x,y)=>y.score-x.score);
+
+/* ---------------- Helpers ---------------- */
+const $ = s => document.querySelector(s);
+const $m = v => { const a=Math.abs(v), sg=v<0?"−":""; return a>=1e6?`${sg}$${(a/1e6).toFixed(1)}M`:a>=1e3?`${sg}$${Math.round(a/1e3)}k`:`${sg}$${Math.round(a)}`; };
+const n0 = v => Math.round(v).toLocaleString("en-US");
+const yrs = v => isFinite(v)&&v<100 ? `${v.toFixed(1)} yrs` : "never";
+const pct = v => `${Math.round(v*100)}%`;
+const vCls = v => v==="Viable"?"p-good":v==="Marginal"?"p-warn":"p-bad";
+const verChip = s => s.verified?`<span class="pill p-ver">Verified</span>`:`<span class="pill p-warn">Unverified</span>`;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* windows in hero building */
+(() => { let g=""; for(let r=0;r<8;r++) for(let c=0;c<4;c++){ const lit=(r*7+c*3)%5!==0; g+=`<rect class="${lit&&((r+c)%3===0)?"win":""}" x="${396+c*30}" y="${106+r*28}" width="18" height="14" rx="2" fill="${lit?"#4ED3AC":"#153E33"}" fill-opacity="${lit?.75:1}"/>`;} $("#windows").innerHTML=g; })();
+
+/* ---------------- Router ---------------- */
+const PAGES = ["home","market","screen"];
+function route(){
+  let h = location.hash.replace("#","");
+  if(!PAGES.includes(h)) h="home";
+  PAGES.forEach(p=>$("#p-"+p).hidden = p!==h);
+  document.querySelectorAll("#links a").forEach(a=>a.toggleAttribute("aria-current", a.dataset.r===h) || a.removeAttribute("aria-current"));
+  document.querySelectorAll("#links a").forEach(a=>{ if(a.dataset.r===h) a.setAttribute("aria-current","page"); });
+  if(h==="market") renderMarket();
+  if(h==="screen") renderScreen();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", route);
+
+/* ---------------- Home ---------------- */
+$("#pilotForm").addEventListener("submit", e=>{ e.preventDefault(); $("#pilotOk").hidden=false; });
+
+/* ---------------- Marketplace ---------------- */
+const MAP = {W:900, H:600, sx:420, sy:370, k:160};
+function supPos(s){ const r=s.miles*MAP.k, t=s.ang*Math.PI/180; return [MAP.sx+Math.cos(t)*r, MAP.sy-Math.sin(t)*r]; }
+function buyPos(b){ return [MAP.sx+b.mx*MAP.k, MAP.sy-b.my*MAP.k]; }
+function visibleSuppliers(){ const m=S.m; return SUPPLIERS.filter(s=>(m.cooling==="all"||s.cooling===m.cooling)&&(!m.verified||s.verified)&&s.miles<=m.maxMi); }
+function renderMarket(){
+  const m=S.m, evs=Object.fromEntries(ranked(DEF_REQ).map(e=>[e.s.id,e]));
+  document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.tab===m.tab));
+  $("#filters").innerHTML = m.tab==="sup" ? `
+    <div class="seg" role="group" aria-label="Cooling type">${["all","liquid","air"].map(c=>`<button type="button" data-cool="${c}" aria-pressed="${m.cooling===c}">${c==="all"?"All cooling":c==="liquid"?"Liquid-cooled":"Air-cooled"}</button>`).join("")}</div>
+    <button type="button" class="toggle" id="verTog" aria-pressed="${m.verified}">✓ Verified only</button>
+    <label class="range" for="maxMi">Within <input id="maxMi" type="range" min="0.5" max="3" step="0.1" value="${m.maxMi}"> <span class="mono" id="maxMiV">${m.maxMi.toFixed(1)} mi</span></label>`
+    : `<span class="muted" style="font-size:.88rem">Buildings looking for heat. Suppliers see these requests.</span>`;
+  const vis = new Set(visibleSuppliers().map(s=>s.id));
+  /* map */
+  let g = "";
+  for(let x=0;x<=MAP.W;x+=80) g+=`<line x1="${x}" y1="0" x2="${x}" y2="${MAP.H}" stroke="#10241E"/>`;
+  for(let y=0;y<=MAP.H;y+=80) g+=`<line x1="0" y1="${y}" x2="${MAP.W}" y2="${y}" stroke="#10241E"/>`;
+  g += `<path d="M0 120 C 120 140, 180 60, 300 0" stroke="#173B4A" stroke-width="18" fill="none"/>
+    <text x="40" y="96" font-family="Noto Sans Mono,monospace" font-size="12" fill="#5C8494" transform="rotate(-18 40 96)">Chattahoochee River</text>
+    <path d="M640 600 L 720 330 L 790 0" stroke="#24433A" stroke-width="12" fill="none"/>
+    <text x="728" y="300" font-family="Noto Sans Mono,monospace" font-size="12" fill="#7F978E">I-75/85</text>
+    <path d="M300 600 L 470 0" stroke="#1C3830" stroke-width="5" fill="none"/>
+    <text x="474" y="40" font-family="Noto Sans Mono,monospace" font-size="11" fill="#7F978E">Howell Mill Rd</text>
+    <path d="M0 470 C 300 420, 560 340, 900 250" stroke="#1C3830" stroke-width="5" fill="none"/>
+    <text x="760" y="262" font-family="Noto Sans Mono,monospace" font-size="11" fill="#7F978E">Marietta St</text>
+    <path d="M0 250 C 260 300, 560 520, 900 560" stroke="#2E5246" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+    <text x="40" y="244" font-family="Noto Sans Mono,monospace" font-size="11" fill="#7F978E">rail</text>`;
+  [0.5,1,2].forEach(mi=>{ g+=`<circle cx="${MAP.sx}" cy="${MAP.sy}" r="${mi*MAP.k}" fill="none" stroke="#2E5246" stroke-dasharray="3 6"/><text x="${MAP.sx+mi*MAP.k*0.707+6}" y="${MAP.sy+mi*MAP.k*0.707+14}" font-family="Noto Sans Mono,monospace" font-size="11" fill="#7F978E">${mi} mi</text>`; });
+  if(m.tab==="sup") g+=`<circle cx="${MAP.sx}" cy="${MAP.sy}" r="${m.maxMi*MAP.k}" fill="#4ED3AC" fill-opacity=".04" stroke="#4ED3AC" stroke-opacity=".5"/>`;
+  const sel = m.sel && SUPPLIERS.find(s=>s.id===m.sel);
+  if(sel && m.tab==="sup"){ const [x,y]=supPos(sel); g+=`<path d="M${MAP.sx} ${MAP.sy} L ${x} ${MAP.sy} L ${x} ${y}" stroke="url(#mg)" stroke-width="5" fill="none" stroke-linejoin="round"/><path class="flow-dash" d="M${x} ${y} L ${x} ${MAP.sy} L ${MAP.sx} ${MAP.sy}" stroke="#F2F7F0" stroke-opacity=".7" stroke-width="2" fill="none"/>`; }
+  BUYERS.forEach(b=>{ const [x,y]=buyPos(b); const on=m.tab==="buy"||b.mine;
+    g+=`<g class="node" data-buy="${b.id}" opacity="${on?1:.35}"><rect x="${x-9}" y="${y-9}" width="18" height="18" rx="4" fill="${b.mine?"#F2F7F0":"#4ED3AC"}" stroke="#06120E" stroke-width="2"/>${b.mine||m.tab==="buy"?`<text x="${b.mine?x-14:x+14}" y="${y+24}" text-anchor="${b.mine?"end":"start"}" font-family="Noto Sans,sans-serif" font-size="13" font-weight="600" fill="#F2F7F0">${esc(b.name)}</text>`:""}</g>`; });
+  SUPPLIERS.forEach(s=>{ const [x,y]=supPos(s), on=vis.has(s.id)&&m.tab==="sup", isSel=m.sel===s.id;
+    g+=`<g class="node" data-sup="${s.id}" opacity="${on?1:.25}">${on?`<circle class="halo" cx="${x}" cy="${y}" r="14" fill="#F3AF67" fill-opacity=".35"/>`:""}
+      <circle cx="${x}" cy="${y}" r="${isSel?13:10}" fill="#F3AF67" stroke="${isSel?"#F2F7F0":"#06120E"}" stroke-width="${isSel?3:2}"/>
+      ${on?`<text x="${s.left?x-16:x+16}" y="${y-12}" text-anchor="${s.left?"end":"start"}" font-family="Noto Sans,sans-serif" font-size="13" font-weight="${isSel?700:500}" fill="${isSel?"#F3AF67":"#F2F7F0"}">${esc(s.name)}</text>`:""}</g>`; });
+  $("#map").innerHTML = `<svg viewBox="0 0 ${MAP.W} ${MAP.H}" role="img" aria-label="Schematic map of suppliers and heat requests around Westside Yards"><defs><linearGradient id="mg"><stop offset="0" stop-color="#4ED3AC"/><stop offset="1" stop-color="#F3AF67"/></linearGradient></defs>${g}</svg>`;
+  /* list */
+  if(m.tab==="sup"){
+    const list = SUPPLIERS.filter(s=>vis.has(s.id)).map(s=>evs[s.id]).sort((a,b)=>b.score-a.score);
+    $("#mlist").innerHTML = list.length ? list.map(e=>`<article class="card lcard ${m.sel===e.s.id?"sel":""}" data-sel="${e.s.id}" id="lc-${e.s.id}">
+      <div class="lrow"><div><h3>${esc(e.s.name)}</h3><p class="dim" style="font-size:.82rem">${e.s.op} · ${e.s.cooling==="liquid"?"liquid-cooled":"air-cooled"} · ${e.s.miles} mi</p></div>${verChip(e.s)}</div>
+      <div class="lstats"><div><div class="v">${n0(e.availKW)} kW</div><div class="k">recoverable heat</div></div><div><div class="v">${Math.round(cToF(e.s.tempC))} °F</div><div class="k">waste heat</div></div><div><div class="v">${yrs(e.payback)}</div><div class="k">payback for you</div></div></div>
+      ${m.sel===e.s.id?`<p class="muted" style="font-size:.86rem">Heat source: ${esc(e.s.src.toLowerCase())}.</p>`:""}
+      <div class="lrow"><span class="pill ${vCls(e.verdict)}">${e.verdict} for Westside Yards</span><button class="btn small ${m.sel===e.s.id?"primary":""}" type="button" data-screen="${e.s.id}">Screen match →</button></div>
+    </article>`).join("") : `<div class="card lcard"><p class="muted">No suppliers match these filters. Widen the distance or turn off “Verified only”.</p></div>`;
+  } else {
+    $("#mlist").innerHTML = BUYERS.map(b=>`<article class="card lcard ${b.mine?"sel":""}">
+      <div class="lrow"><div><h3>${esc(b.name)}</h3><p class="dim" style="font-size:.82rem">${esc(b.type)}</p></div>${b.mine?`<span class="pill p-good">Your project</span>`:`<span class="pill p-ver">Open request</span>`}</div>
+      <div class="lstats"><div><div class="v">${n0(b.demand)}</div><div class="k">MWh/yr</div></div><div><div class="v">${n0(b.peak)} kW</div><div class="k">peak load</div></div><div><div class="v">${b.supplyF} °F</div><div class="k">supply temp</div></div></div>
+    </article>`).join("");
+  }
+}
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-tab]"); if(t){ S.m.tab=t.dataset.tab; S.m.sel=null; renderMarket(); return; }
+  const c=e.target.closest("[data-cool]"); if(c){ S.m.cooling=c.dataset.cool; renderMarket(); return; }
+  if(e.target.closest("#verTog")){ S.m.verified=!S.m.verified; renderMarket(); return; }
+  const sc=e.target.closest("[data-screen]"); if(sc){ S.pick=sc.dataset.screen; S.run="idle"; location.hash="screen"; return; }
+  const n=e.target.closest("[data-sup]"); if(n){ S.m.sel=n.dataset.sup; S.m.tab="sup"; renderMarket(); return; }
+  const l=e.target.closest("[data-sel]"); if(l){ S.m.sel=l.dataset.sel; renderMarket(); return; }
+});
+document.addEventListener("input", e=>{ if(e.target.id==="maxMi"){ S.m.maxMi=+e.target.value; renderMarket(); const el=$("#maxMi"); if(el) el.focus(); } });
+
+/* ---------------- Feasibility ---------------- */
+const LINES = () => {
+  const r=S.req, all=ranked(), v=all.filter(e=>e.verdict==="Viable").length, mg=all.filter(e=>e.verdict==="Marginal").length;
+  return [
+    `Parsed request: ${n0(r.demandMWh)} MWh/yr, ${n0(r.peakKW)} kW peak, ${r.supplyF} °F supply`,
+    `Found ${SUPPLIERS.length} supplier profiles within 3 mi (simulated)`,
+    `Recoverable heat: 75% of IT load if liquid-cooled, 55% if air-cooled`,
+    `Heat-pump COP at 50% of the Carnot limit for each temperature lift`,
+    `Pipe routes at 1.3× straight-line distance, $${n0(S.a.pipe)}/ft installed`,
+    `Ranking by risk-adjusted 25-year NPV at ${S.a.rate}%; unverified counted at 60%`,
+    `Done: ${v} viable, ${mg} marginal, ${all.length-v-mg} not viable`,
+  ];
+};
+function fillForm(){
+  const r=S.req; $("#f-name").value=r.name; $("#f-demand").value=r.demandMWh; $("#f-peak").value=r.peakKW; $("#f-supply").value=r.supplyF; $("#f-base").value=r.baseline; $("#f-elec").value=S.a.elec;
+}
+function readForm(){
+  S.req.name=$("#f-name").value||DEF_REQ.name; S.req.demandMWh=Math.max(100,+$("#f-demand").value||DEF_REQ.demandMWh);
+  S.req.peakKW=Math.max(100,+$("#f-peak").value||DEF_REQ.peakKW); S.req.supplyF=Math.min(200,Math.max(90,+$("#f-supply").value||DEF_REQ.supplyF));
+  S.req.baseline=$("#f-base").value; S.a.elec=Math.max(0.01,+$("#f-elec").value||DEF_A.elec);
+}
+function renderConsole(partial){
+  const L=LINES(), n=S.run==="done"?L.length:S.lines;
+  let h = L.slice(0,n).map((l,i)=>`<div class="ln ${i===L.length-1?"done":""}"><b>${i===L.length-1?"✓":"›"}</b><span>${esc(l)}</span></div>`).join("");
+  if(S.run==="running") h += `<div class="ln"><b>›</b><span>${esc(partial||"")}<span class="caret"></span></span></div>`;
+  if(S.run==="idle") h = `<div class="ln"><b>›</b><span>Ready. Press “Run AI screen” to analyze ${esc(S.req.name)}.<span class="caret"></span></span></div>`;
+  $("#console").innerHTML = h;
+}
+function renderScreen(){ if(document.activeElement?.closest?.("#reqForm")==null) fillForm(); renderConsole(); renderResults(); }
+let runToken=0;
+async function runScreen(){
+  readForm(); const tok=++runToken; S.run="running"; S.lines=0; S.prevRank=null; S.rankMsg=""; $("#results").innerHTML=""; renderConsole("");
+  const L=LINES();
+  for(let i=0;i<L.length;i++){
+    if(!reduced) for(let c=0;c<=L[i].length;c+=3){ if(tok!==runToken) return; renderConsole(L[i].slice(0,c)); await sleep(18); }
+    S.lines=i+1; if(i<L.length-1){ renderConsole(""); await sleep(reduced?0:260); }
+  }
+  S.run="done"; if(!S.pick) S.pick=ranked()[0].s.id; renderConsole(); renderResults();
+}
+$("#reqForm").addEventListener("submit", e=>{ e.preventDefault(); runScreen(); });
+
+function cashChart(e){
+  const W=560,H=230,L=64,R=16,T=18,B=34, yrsN=S.a.years;
+  const pts=[]; for(let t=0;t<=yrsN;t++) pts.push(-e.capex+e.savings*t);
+  const lo=Math.min(...pts,0), hi=Math.max(...pts,0), span=(hi-lo)||1;
+  const X=t=>L+(W-L-R)*t/yrsN, Y=v=>T+(H-T-B)*(hi-v)/span;
+  const path=pts.map((v,t)=>`${t?"L":"M"}${X(t).toFixed(1)} ${Y(v).toFixed(1)}`).join(" ");
+  const area=`${path} L ${X(yrsN)} ${Y(0)} L ${X(0)} ${Y(0)} Z`;
+  const pb=e.payback;
+  let g=`<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="#2E5246"/>`;
+  [0,5,10,15,20,25].forEach(t=>{ g+=`<text x="${X(t)}" y="${H-12}" text-anchor="middle" font-family="Noto Sans Mono,monospace" font-size="11" fill="#7F978E">yr ${t}</text>`; });
+  [hi,0,lo].forEach(v=>{ g+=`<text x="${L-8}" y="${Y(v)+4}" text-anchor="end" font-family="Noto Sans Mono,monospace" font-size="11" fill="#A9BDB5">${$m(v)}</text>`; });
+  g+=`<path d="${area}" fill="#4ED3AC" fill-opacity=".12"/><path d="${path}" stroke="#4ED3AC" stroke-width="3" fill="none"/>`;
+  g+=`<circle cx="${X(0)}" cy="${Y(pts[0])}" r="4" fill="#F08A7E"/><circle cx="${X(yrsN)}" cy="${Y(pts[yrsN])}" r="5" fill="#4ED3AC"/>`;
+  if(isFinite(pb)&&pb<=yrsN) g+=`<line x1="${X(pb)}" x2="${X(pb)}" y1="${T}" y2="${H-B}" stroke="#F3AF67" stroke-dasharray="4 4"/><text x="${X(pb)+6}" y="${T+12}" font-family="Noto Sans,sans-serif" font-size="12" font-weight="700" fill="#F3AF67">Payback ${pb.toFixed(1)} yrs</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative net cash over ${yrsN} years, payback in ${yrs(pb)}">${g}</svg>`;
+}
+function costBars(e){
+  const gross=e.cap.pipe+e.cap.hp+e.cap.ix, max=gross;
+  const row=(k,v,col,neg)=>`<div class="row"><span>${k}</span><div style="display:flex;${neg?"justify-content:flex-start":""}"><div class="t" style="width:${Math.max(2,Math.abs(v)/max*100)}%;background:${col}"></div></div><span class="val">${$m(v)}</span></div>`;
+  return `<div class="cb">${row("Pipe, supply + return",e.cap.pipe,"#F3AF67")}${row("Heat pump",e.cap.hp,"#4ED3AC")}${row("Exchangers + tie-in",e.cap.ix,"#A9BDB5")}${row("Avoided equipment",e.cap.avoid,"repeating-linear-gradient(45deg,#4ED3AC 0 4px,transparent 4px 8px)",true)}
+    <div class="row total"><span>Net investment</span><div></div><span class="val">${$m(e.capex)}</span></div></div>`;
+}
+function renderResults(){
+  if(S.run!=="done"){ $("#results").innerHTML=""; return; }
+  const all=ranked(), e=all.find(x=>x.s.id===S.pick)||all[0], best=all[0], maxS=Math.max(...all.map(x=>Math.abs(x.score)));
+  const rows=all.map((x,i)=>{ let d=""; if(S.prevRank){ const w=S.prevRank.indexOf(x.s.id); if(w>i) d=`<span class="delta up">▲${w-i}</span>`; else if(w<i) d=`<span class="delta down">▼${i-w}</span>`; }
+    return `<div class="rrow ${x===e?"pick":""}" data-pick="${x.s.id}" id="rr-${x.s.id}" role="button" tabindex="0">
+      <span class="rk">#${i+1}${d}</span><span class="nm">${esc(x.s.name)}<small>${x.s.miles} mi · ${x.s.cooling} · ${x.s.verified?"verified":"unverified"}</small></span>
+      <span class="hide-s"><div class="bar"><i class="${x.score<0?"neg":""}" style="width:${Math.abs(x.score)/maxS*100}%"></i></div></span>
+      <span class="c hide-s">${$m(x.score)}</span><span class="c"><span class="pill ${vCls(x.verdict)}">${x.verdict}</span></span></div>`; }).join("");
+  const pipeShare=e.cap.pipe/(e.cap.pipe+e.cap.hp+e.cap.ix);
+  const notes=[
+    `Waste heat arrives at ${Math.round(cToF(e.srcC))} °F. The heat pump lifts it ${Math.round(e.lift*9/5)} °F to ${S.req.supplyF} °F at COP ${e.cop.toFixed(1)}.`,
+    e.share>=1?`Covers all annual heat demand. A backup system is still needed for outages.`:`Covers ${pct(e.share)} of annual demand. The rest stays on ${BASE[S.req.baseline]}.`,
+    `Pipe is ${pct(pipeShare)} of up-front cost, so a local engineering bid matters most.`,
+    `The supplier earns about ${$m(e.supplierRev)} a year at $${S.a.heatPrice}/MWh, a reason to say yes.`,
+  ];
+  const qs=[...(e.s.verified?[]:["Operator has not confirmed it will export heat"]),...e.s.risks,"Hourly heat profile not provided yet"];
+  $("#results").innerHTML = `<div style="display:grid;gap:16px" class="fade-in">
+    <div class="card panel" id="rankPanel"><div class="lrow"><h3>Ranked matches for ${esc(S.req.name)}</h3><span class="dim" style="font-size:.8rem">Risk-adjusted 25-year NPV</span></div>
+      <div class="rtable" id="rtable">${rows}</div></div>
+    <div class="card panel" id="sensPanel"><div><div class="eyebrow">Sensitivity</div><h3 style="font-size:1.3rem;margin-top:6px">Pipe cost is the biggest unknown. Test it.</h3></div>
+      <div class="sens"><div class="slider"><label for="pipe">Pipe cost, installed</label><div class="val" id="pipeVal">$${n0(S.a.pipe)}<span class="dim" style="font-size:.9rem">/ft</span></div>
+        <input id="pipe" type="range" min="300" max="1600" step="50" value="${S.a.pipe}"><span class="dim" style="font-size:.78rem">Per trench foot, supply and return together</span></div>
+        <div style="display:grid;gap:10px;align-content:start"><p class="muted">Best deal right now: <b style="color:var(--ink)">${esc(best.s.name)}</b>, ${$m(best.score)} risk-adjusted.</p>${S.rankMsg?`<div class="toast" role="status">${esc(S.rankMsg)}</div>`:""}</div></div></div>
+    <div class="card panel" id="report">
+      <div class="lrow" style="flex-wrap:wrap"><div><div class="eyebrow">Feasibility report</div><h2 style="font-size:1.7rem;margin-top:6px">${esc(e.s.name)}</h2><p class="dim">${e.s.op} · ${e.s.miles} mi · ${esc(e.s.src)}</p></div>
+        <div style="display:flex;gap:8px;align-items:center">${verChip(e.s)}<button class="btn amber" type="button" id="introBtn">Request introduction</button></div></div>
+      <div class="kpis">
+        <div class="kpi"><div class="v"><span class="pill ${vCls(e.verdict)}" style="font-size:.95rem">${e.verdict}</span></div><div class="k">screening result</div></div>
+        <div class="kpi"><div class="v">${$m(e.capex)}</div><div class="k">net investment</div></div>
+        <div class="kpi"><div class="v">${$m(e.savings)}</div><div class="k">savings per year</div></div>
+        <div class="kpi"><div class="v">${yrs(e.payback)}</div><div class="k">payback</div></div>
+        <div class="kpi"><div class="v">${$m(e.npv)}</div><div class="k">25-year NPV</div></div>
+      </div>
+      <div class="two" id="charts">
+        <div class="box"><div class="bh"><h3>Cumulative cash</h3><span class="dim" style="font-size:.78rem">undiscounted</span></div><div class="chart">${cashChart(e)}</div></div>
+        <div class="box"><div class="bh"><h3>Up-front cost</h3></div>${costBars(e)}
+          <div class="temps" style="margin-top:6px"><div><div class="v">${Math.round(cToF(e.srcC))} °F</div><div class="k">waste heat in</div></div><div><div class="v">COP ${e.cop.toFixed(1)}</div><div class="k">heat pump</div></div><div><div class="v">${S.req.supplyF} °F</div><div class="k">building supply</div></div></div>
+          <div class="ramp" aria-hidden="true"></div></div>
+      </div>
+      <div class="two">
+        <div class="box"><h3>Analyst notes</h3><ul class="notes">${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+        <div class="box"><h3>Still to confirm</h3><ul class="notes">${qs.map(n=>`<li class="q">${esc(n)}</li>`).join("")}</ul></div>
+      </div>
+    </div>
+  </div>`;
+  const p=$("#pipe"); if(p) p.addEventListener("input", ev=>setPipe(+ev.target.value));
+}
+function setPipe(v){
+  const before=ranked().map(x=>x.s.id), tops={};
+  document.querySelectorAll(".rrow").forEach(el=>tops[el.dataset.pick]=el.getBoundingClientRect().top);
+  S.a.pipe=v; const after=ranked().map(x=>x.s.id);
+  if(before.join()!==after.join()){ S.prevRank=before; if(before[0]!==after[0]){ S.rankMsg=`Ranking changed: ${SUPPLIERS.find(s=>s.id===after[0]).name} is now the best deal.`; S.pick=after[0]; } }
+  const focused=document.activeElement&&document.activeElement.id==="pipe", y=window.scrollY;
+  renderResults(); window.scrollTo(0,y); document.querySelector("#results > div")?.classList.remove("fade-in");
+  if(focused) $("#pipe").focus();
+  if(!reduced) document.querySelectorAll(".rrow").forEach(el=>{ const o=tops[el.dataset.pick]; if(o==null) return; const dy=o-el.getBoundingClientRect().top; if(!dy) return;
+    el.style.transition="none"; el.style.transform=`translateY(${dy}px)`; requestAnimationFrame(()=>{ el.style.transition="transform .5s cubic-bezier(.2,.8,.2,1)"; el.style.transform=""; }); });
+}
+document.addEventListener("click", e=>{
+  const r=e.target.closest("[data-pick]"); if(r){ S.pick=r.dataset.pick; const y=window.scrollY; renderResults(); window.scrollTo(0,y); document.querySelector("#results > div")?.classList.remove("fade-in"); return; }
+  if(e.target.closest("#introBtn")) openIntro();
+});
+
+/* ---------------- Introduction modal (simulated) ---------------- */
+const FLOW=[["Request sent","The supplier sees the screen, not your contact details."],["Supplier reviews","They check heat availability and offtake terms."],["Mutual interest confirmed","Both sides opt in, so Exerra makes the intro."],["Engineering partner briefed","A design firm prices the real connection."]];
+function introHTML(){
+  const all=ranked(), e=all.find(x=>x.s.id===S.pick)||all[0], st=S.intro;
+  const msg=`To: ${e.s.name}\n\nA ${n0(S.req.demandMWh)} MWh/yr project ${e.s.miles} mi away could use ${n0(e.delivered)} MWh/yr of your waste heat, worth about ${$m(e.supplierRev)}/yr to you.\n\nInterested in an introduction?`;
+  return `<div class="card" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="lrow"><div><div class="eyebrow">Connect</div><h2 id="mt" style="font-size:1.6rem;margin-top:6px">Request an introduction</h2></div><span class="tag t-sim">Simulated</span></div>
+    <div class="msg">${esc(msg)}</div>
+    <ol class="flowl">${FLOW.map(([t,d],i)=>`<li class="${i<=st?"on":""}"><span class="dot">${i<=st?"✓":""}</span><div><div class="t">${t}</div><div class="d">${d}</div></div></li>`).join("")}</ol>
+    ${st>=FLOW.length-1?`<div class="ok">Introduction made: ${esc(S.req.name)} ↔ ${esc(e.s.name)}. Exerra sells the decision, not the pipes.</div>`:""}
+    <div style="display:flex;gap:10px;justify-content:flex-end">${st<0?`<button class="btn primary" type="button" id="sendIntro">Send request</button>`:""}<button class="btn" type="button" id="closeIntro">Close</button></div></div>`;
+}
+function openIntro(){ S.intro=-1; const m=$("#modal"); m.innerHTML=introHTML(); m.hidden=false; }
+function drawIntro(){ $("#modal").innerHTML=introHTML(); }
+$("#modal").addEventListener("click", async e=>{
+  if(e.target.id==="closeIntro"||e.target.id==="modal"){ $("#modal").hidden=true; return; }
+  if(e.target.id==="sendIntro"){ S.intro=0; drawIntro(); for(let i=1;i<FLOW.length;i++){ await sleep(reduced?0:900); if($("#modal").hidden) return; S.intro=i; drawIntro(); } }
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") $("#modal").hidden=true; });
+
+route();
+})();
+</script>
+</body>
+</html>
+
