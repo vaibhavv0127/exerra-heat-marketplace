@@ -26,7 +26,7 @@ Although the interface uses the label “AI Feasibility,” its calculations are
 
 ## Team and development
 
-HackATL 2026 team project. Add the team members and their contributions here.
+HackATL 2026 team project.
 
-Claude Code was used as coding assistance during prototype development. Add any additional credits or disclosures required by the team or HackATL.
+Claude Code was used as coding assistance during prototype development.
 
